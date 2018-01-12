@@ -1,0 +1,10 @@
+package:       github.com/Wang-Kai/echo
+import:
+- package:     github.com/coreos/etcd
+  version:     3.2.9
+  subpackages:
+  - clientv3
+  - mvcc/mvccpb
+- package:     github.com/dchest/uniuri
+testImport:
+- package:     github.com/goushuyun/log
