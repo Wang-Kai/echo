@@ -29,7 +29,7 @@ func TestEcho(t *testing.T) {
 
 	// test Destory
 	go func(e *Echo) {
-		timer := time.NewTimer(time.Second * 10)
+		timer := time.NewTimer(time.Second * 30)
 		<-timer.C
 		e.Destroy()
 	}(echo)
