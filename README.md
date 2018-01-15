@@ -13,9 +13,6 @@ $ go get -u -v github.com/Wang-Kai/echo
 ```go
 /*
 	1) create your setting map (it should be map[string]string)
-	if you want to make global configuration paramters,
-	add "_" before paramter name,
-	otherwise means it is an private paramter
 */
 var setting = map[string]string{
 	"_name": "Wang",
@@ -28,12 +25,21 @@ if err != nil {
 	log.Fatal(err)
 }
 
-// 3) take your configurations map to echo
+// 3) detory map defore app down
+defer EchoAgent.Destroy()
+
+// 4) take your configurations map to echo
 err = EchoAgent.Trusteeship(SettingMap)
 if err != nil {
 	log.Fatal(err)
 }
-
-// 4) detory map defore app down
-defer EchoAgent.Destroy()
 ```
+
+## Features
+
+In order to meet a variety of application scenarios. For example you want to share same paramter in many apps, or you need use a paramter in many app with different value. Echo provide two kind paramters, global and private paramter.
+
+* **Global paramter**: add "_" before paramter name, eg: '\_apiToken'
+* **Private parameter**: **don't** prefix with '_', eg: "name"
+
+I hope it can solve your problem, and enjoy it . 🤣
