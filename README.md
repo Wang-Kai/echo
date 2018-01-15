@@ -32,6 +32,13 @@ err = EchoAgent.Trusteeship(SettingMap)
 if err != nil {
 	log.Fatal(err)
 }
+
+// Now, you can use setting anywhere ...  the data in map will dynamic change, if you modify it at etcd
+ticker := time.NewTicker(3 * time.Second)
+for {
+	fmt.Printf("%+v", setting)
+	<-ticker.C
+}
 ```
 
 ## Features
