@@ -1,5 +1,5 @@
-hash: a265e8bc360f1b894200cacdf9b8612d85ca4a36ffa161108c7fc29ba12fa4dd
-updated: 2018-01-14T17:50:53.282735+08:00
+hash: eb2b11ab64e94a3d1fe4eca5396e8aa0b0e49922f86b9a79194eb65c2caa1051
+updated: 2018-01-14T19:36:14.321112+08:00
 imports:
 - name: github.com/coreos/etcd
   version: f1d7dd87da3e8feab4aaf675b8e29c6a5ed5f58b
@@ -27,7 +27,7 @@ imports:
   - lex/httplex
   - trace
 - name: golang.org/x/text
-  version: e19ae1496984b1c655b8044a65c0300a3c878dd3
+  version: b19bf474d317b857955b12035d2c5acb57ce8b01
   subpackages:
   - secure/bidirule
   - transform

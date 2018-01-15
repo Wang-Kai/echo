@@ -8,12 +8,12 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	Init([]string{"adsfasdf"})
+	Init([]string{"localhost:2379"})
 }
 
 func TestEcho(t *testing.T) {
 	var setting = map[string]string{
-		"_name": "China",
+		"_name": "Wang",
 		"age":   "26",
 	}
 
@@ -30,7 +30,6 @@ func TestEcho(t *testing.T) {
 	// test Destory
 	go func(e *Echo) {
 		timer := time.NewTimer(time.Second * 10)
-
 		<-timer.C
 		e.Destroy()
 	}(echo)

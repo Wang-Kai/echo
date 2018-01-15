@@ -14,6 +14,7 @@ import (
 
 var cli *clientv3.Client
 
+// Init connect to etcd server and generate an Echo struct pointer
 func Init(endpoints []string) (*Echo, error) {
 	var err error
 
@@ -36,7 +37,7 @@ type Echo struct {
 	Map   map[string]string
 }
 
-// export an API to accept a map as dynamic config
+// Trusteeship accept a map as dynamic config, and put every k/v into etcd
 func (e *Echo) Trusteeship(kvMap map[string]string) error {
 	// put k/v into etcd
 	for key, val := range kvMap {
