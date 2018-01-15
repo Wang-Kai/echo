@@ -11,9 +11,8 @@ $ go get -u -v github.com/Wang-Kai/echo
 
 ## Usage
 ```go
-/*
-	1) create your setting map (it should be map[string]string)
-*/
+
+// 1) create your setting map (it should be map[string]string)
 var setting = map[string]string{
 	"_name": "Wang",
 	"age":   "26",
@@ -37,7 +36,7 @@ if err != nil {
 
 ## Features
 
-In order to meet a variety of application scenarios. For example you want to share same paramter in many apps, or you need use a paramter in many app with different value. Echo provide two kind paramters, global and private paramter.
+In order to meet a variety of application scenarios. For example you want to share same parameter in many apps, or you need use a paramter in many app with different value. Echo provide two kind paramters, global and private paramter.
 
 * **Global paramter**: add "_" before paramter name, eg: '\_apiToken'
 * **Private parameter**: **don't** prefix with '_', eg: "name"
