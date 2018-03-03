@@ -3,107 +3,106 @@ package echo
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
-	"github.com/coreos/etcd/mvcc/mvccpb"
-	"github.com/dchest/uniuri"
 )
 
-var cli *clientv3.Client
+type Config map[string]string
 
-// Init connect to etcd server and generate an Echo struct pointer
-func Init(endpoints []string) (*Echo, error) {
+type Echo struct {
+	Configs map[string]Config
+}
+
+var (
+	cli = new(clientv3.Client)
+)
+
+/*
+	New make link to etcd server, and create Echo instance
+
+	@endponters: the url of etcd server
+*/
+func New(endponters ...string) (*Echo, error) {
 	var err error
-
-	// connect etcd
 	cli, err = clientv3.New(clientv3.Config{
-		Endpoints:   endpoints,
+		Endpoints:   endponters,
 		DialTimeout: 10 * time.Second,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	// gen an nonce data
-	var nonce = uniuri.New()
-	return &Echo{Nonce: nonce}, nil
+	// init echo instance' Configs attribute
+	echo := &Echo{}
+	echo.Configs = make(map[string]Config)
+	return echo, nil
 }
 
-type Echo struct {
-	Nonce string
-	Map   map[string]string
-}
+/*
+	GetConf get all k/v from etcd prefix with special etcdDir, and save k/v in map
 
-// Trusteeship accept a map as dynamic config, and put every k/v into etcd
-func (e *Echo) Trusteeship(kvMap map[string]string) error {
-	// put k/v into etcd
-	for key, val := range kvMap {
-		if strings.HasPrefix(key, "_") {
-			// global params
-			key = fmt.Sprintf("echo/%s", key)
-		} else {
-			// private params
-			key = fmt.Sprintf("echo/%s/%s", e.Nonce, key)
-		}
-
-		_, err := cli.Put(context.Background(), key, val)
-		if err != nil {
-			return err
-		}
+	@etcdDir: the dir of config keys prefix with
+*/
+func (e *Echo) GetConf(etcdDir string) (map[string]string, error) {
+	resp, err := cli.Get(context.Background(), etcdDir, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
 	}
 
-	e.Map = kvMap
-	// start to watch
-	go e.watch()
-	return nil
+	var config = make(Config)
+
+	for _, ev := range resp.Kvs {
+		key := fmt.Sprintf("%s", ev.Key)
+		val := fmt.Sprintf("%s", ev.Value)
+		key = removeDir(key, 1)
+		config[key] = val
+	}
+
+	e.Configs[etcdDir] = config
+	go e.watchConfDir(etcdDir)
+
+	return config, nil
 }
 
-// Destroy Trusteeship , remove all k/v in map from etcd
-func (e *Echo) Destroy() error {
+/*
+	watchConfDir watch special etcd's dir and update map value in memory
+
+	@etcdDir the dir that will be watched
+*/
+func (e *Echo) watchConfDir(etcdDir string) {
 	defer cli.Close()
 
-	// delete all private params
-	var key = fmt.Sprintf("echo/%s", e.Nonce)
+	config := e.Configs[etcdDir]
 
-	log.Printf("Delete ====>  %s", key)
-	_, err := cli.Delete(context.Background(), key, clientv3.WithPrefix())
-	if err != nil {
-		return err
-	}
-
-	for k := range e.Map {
-		delete(e.Map, k)
-	}
-	return nil
-}
-
-func (e *Echo) watch() {
-	rch := cli.Watch(context.Background(), "echo", clientv3.WithPrefix())
+	rch := cli.Watch(context.Background(), etcdDir, clientv3.WithPrefix())
 	for wresp := range rch {
+
 		for _, ev := range wresp.Events {
+			key := fmt.Sprintf("%s", ev.Kv.Key)
+			key = removeDir(key, 1)
+			val := fmt.Sprintf("%s", ev.Kv.Value)
+
 			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
-			var (
-				key = fmt.Sprintf("%s", ev.Kv.Key)
-				val = fmt.Sprintf("%s", ev.Kv.Value)
-			)
-			// check if this action is concern me
-			keys := strings.Split(key, "/")
-			if len(keys) == 3 && keys[1] != e.Nonce {
-				// this private params is not concern me
-				continue
-			}
-
-			mapKey := keys[len(keys)-1]
-
-			switch ev.Type {
-			case mvccpb.PUT:
-				e.Map[mapKey] = val
-			case mvccpb.DELETE:
-				delete(e.Map, mapKey)
+			if ev.Type == clientv3.EventTypePut {
+				// Put operate
+				config[key] = val
+			} else if ev.Type == clientv3.EventTypeDelete {
+				// Delete operate
+				delete(config, key)
 			}
 		}
 	}
+}
+
+/*
+	removeDir remove special level dir
+
+	@key the key will be operated
+	@level how many level dir will be removed
+*/
+func removeDir(key string, level int) string {
+	keySnippet := strings.Split(key, "/")
+	return strings.Join(keySnippet[level:], "/")
 }

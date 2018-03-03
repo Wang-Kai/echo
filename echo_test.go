@@ -7,36 +7,27 @@ import (
 	"github.com/goushuyun/log"
 )
 
-func TestInit(t *testing.T) {
-	Init([]string{"localhost:2379"})
+func TestGetConf(t *testing.T) {
+	echo, err := New("http://localhost:2379")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config, err := echo.GetConf("echo/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log.JSON(config)
+
+	ticker := time.NewTicker(time.Second * 5)
+
+	for range ticker.C {
+		log.JSONIndent(config)
+	}
 }
 
-func TestEcho(t *testing.T) {
-	var setting = map[string]string{
-		"_name": "Wang",
-		"age":   "26",
-	}
-
-	echo, err := Init([]string{"localhost:2379"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = echo.Trusteeship(setting)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// test Destory
-	go func(e *Echo) {
-		timer := time.NewTimer(time.Second * 30)
-		<-timer.C
-		e.Destroy()
-	}(echo)
-
-	ticker := time.NewTicker(3 * time.Second)
-	for {
-		log.JSON(setting)
-		<-ticker.C
-	}
+func TestRemoveDir(t *testing.T) {
+	key := removeDir("echo/klQn3lLIpjekYZI4/age", 1)
+	t.Log(key)
 }

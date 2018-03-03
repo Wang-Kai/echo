@@ -5,6 +5,4 @@ import:
   subpackages:
   - clientv3
   - mvcc/mvccpb
-- package:     github.com/dchest/uniuri
-testImport:
 - package:     github.com/goushuyun/log
