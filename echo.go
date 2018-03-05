@@ -9,11 +9,13 @@ import (
 	"github.com/coreos/etcd/clientv3"
 )
 
-type Config map[string]string
+type (
+	Config map[string]string
 
-type Echo struct {
-	Configs map[string]Config
-}
+	Echo struct {
+		Configs map[string]Config
+	}
+)
 
 var (
 	cli = new(clientv3.Client)
@@ -45,7 +47,7 @@ func New(endponters ...string) (*Echo, error) {
 
 	@etcdDir: the dir of config keys prefix with
 */
-func (e *Echo) GetConf(etcdDir string) (map[string]string, error) {
+func (e *Echo) GetConf(etcdDir string) (Config, error) {
 	resp, err := cli.Get(context.Background(), etcdDir, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
