@@ -13,7 +13,7 @@ func TestGetConf(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := echo.GetConf("echo/")
+	config, err := echo.GetConf("uservice_app/")
 	if err != nil {
 		t.Fatal(err)
 	}
