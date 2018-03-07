@@ -28,6 +28,6 @@ func TestGetConf(t *testing.T) {
 }
 
 func TestRemoveDir(t *testing.T) {
-	key := removeDir("echo/klQn3lLIpjekYZI4/age", 1)
+	key := removeDirPrefix("echo/klQn3lLIpjekYZI4/age", 1)
 	t.Log(key)
 }

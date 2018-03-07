@@ -58,7 +58,7 @@ func (e *Echo) GetConf(etcdDir string) (Config, error) {
 	for _, ev := range resp.Kvs {
 		key := fmt.Sprintf("%s", ev.Key)
 		val := fmt.Sprintf("%s", ev.Value)
-		key = removeDir(key, 1)
+		key = removeDirPrefix(key, 1)
 		config[key] = val
 	}
 
@@ -83,7 +83,7 @@ func (e *Echo) watchConfDir(etcdDir string) {
 
 		for _, ev := range wresp.Events {
 			key := fmt.Sprintf("%s", ev.Kv.Key)
-			key = removeDir(key, 1)
+			key = removeDirPrefix(key, 1)
 			val := fmt.Sprintf("%s", ev.Kv.Value)
 
 			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
@@ -104,7 +104,7 @@ func (e *Echo) watchConfDir(etcdDir string) {
 	@key the key will be operated
 	@level how many level dir will be removed
 */
-func removeDir(key string, level int) string {
+func removeDirPrefix(key string, level int) string {
 	keySnippet := strings.Split(key, "/")
 	return strings.Join(keySnippet[level:], "/")
 }
