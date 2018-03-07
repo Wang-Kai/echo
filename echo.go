@@ -48,12 +48,17 @@ func New(endponters ...string) (*Echo, error) {
 	@etcdDir: the dir of config keys prefix with
 */
 func (e *Echo) GetConf(etcdDir string) (Config, error) {
+	config, ok := e.Configs[etcdDir]
+	if ok {
+		return config, nil
+	}
+
 	resp, err := cli.Get(context.Background(), etcdDir, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
 
-	var config = make(Config)
+	config = make(Config)
 
 	for _, ev := range resp.Kvs {
 		key := fmt.Sprintf("%s", ev.Key)
