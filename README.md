@@ -1,4 +1,4 @@
-# echo
+# echo[![GoDoc](https://godoc.org/github.com/Wang-Kai/echo?status.svg)](https://godoc.org/github.com/Wang-Kai/echo)
 
 Echo is a configuration manager based etcd .
 
