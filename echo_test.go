@@ -13,20 +13,18 @@ func TestGetConf(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := echo.GetConf("/")
+	config, err := echo.GetConf("hi")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ticker := time.NewTicker(time.Second * 3)
+	ticker := time.NewTicker(time.Second * 2)
 	for range ticker.C {
 		log.Printf("%+v", config)
-
-		log.Println(config.Get("name"))
 	}
 }
 
 func TestRemoveDir(t *testing.T) {
-	key := removeDirPrefix("echo/klQn3lLIpjekYZI4/age", 1)
+	key := removeDirPrefix("echo/klQn3lL/IpjekYZI4/age/me")
 	log.Println(key)
 }

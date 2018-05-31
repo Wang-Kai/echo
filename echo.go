@@ -13,8 +13,10 @@ import (
 type Config map[string]string
 
 // Get return value in config for `k`
-func (c Config) Get(k string) string {
-	return c[k]
+func (c Config) Get(k string) (val string, exist bool) {
+	val, exist = c[k]
+
+	return val, exist
 }
 
 // Echo the instance of echo lib
@@ -66,7 +68,7 @@ func (e *Echo) GetConf(etcdDir string) (Config, error) {
 
 	for _, ev := range resp.Kvs {
 		key, val := fmt.Sprintf("%s", ev.Key), fmt.Sprintf("%s", ev.Value)
-		key = removeDirPrefix(key, 1)
+		key = removeDirPrefix(key)
 
 		config[key] = val
 	}
@@ -92,7 +94,7 @@ func (e *Echo) watchConfDir(etcdDir string) {
 
 		for _, ev := range wresp.Events {
 			key := fmt.Sprintf("%s", ev.Kv.Key)
-			key = removeDirPrefix(key, 1)
+			key = removeDirPrefix(key)
 			val := fmt.Sprintf("%s", ev.Kv.Value)
 
 			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
@@ -104,16 +106,18 @@ func (e *Echo) watchConfDir(etcdDir string) {
 				delete(config, key)
 			}
 		}
+
 	}
 }
 
 /*
-	removeDir remove special level dir
+	removeDir remove dir prefix, and return key name
 
 	@key the key will be operated
 	@level how many level dir will be removed
 */
-func removeDirPrefix(key string, level int) string {
-	keySnippet := strings.Split(key, "/")
-	return strings.Join(keySnippet[level:], "/")
+func removeDirPrefix(key string) string {
+	dirSplts := strings.Split(key, "/")
+
+	return dirSplts[len(dirSplts)-1]
 }
