@@ -9,17 +9,20 @@ import (
 	"github.com/coreos/etcd/clientv3"
 )
 
-type (
-	Config map[string]string
+// Config a k/v string map to save setting info
+type Config map[string]string
 
-	Echo struct {
-		Configs map[string]Config
-	}
-)
+// Get return value in config for `k`
+func (c Config) Get(k string) string {
+	return c[k]
+}
 
-var (
-	cli = new(clientv3.Client)
-)
+// Echo the instance of echo lib
+type Echo struct {
+	Configs map[string]Config
+}
+
+var cli = new(clientv3.Client)
 
 /*
 	New make link to etcd server, and create Echo instance
@@ -37,8 +40,9 @@ func New(endponters ...string) (*Echo, error) {
 	}
 
 	// init echo instance' Configs attribute
-	echo := &Echo{}
-	echo.Configs = make(map[string]Config)
+	echo := &Echo{
+		Configs: make(map[string]Config),
+	}
 	return echo, nil
 }
 
@@ -61,9 +65,9 @@ func (e *Echo) GetConf(etcdDir string) (Config, error) {
 	config = make(Config)
 
 	for _, ev := range resp.Kvs {
-		key := fmt.Sprintf("%s", ev.Key)
-		val := fmt.Sprintf("%s", ev.Value)
+		key, val := fmt.Sprintf("%s", ev.Key), fmt.Sprintf("%s", ev.Value)
 		key = removeDirPrefix(key, 1)
+
 		config[key] = val
 	}
 

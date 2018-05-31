@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goushuyun/log"
+	"log"
 )
 
 func TestGetConf(t *testing.T) {
@@ -13,21 +13,20 @@ func TestGetConf(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	config, err := echo.GetConf("uservice_app/")
+	config, err := echo.GetConf("/")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	log.JSON(config)
-
-	ticker := time.NewTicker(time.Second * 5)
-
+	ticker := time.NewTicker(time.Second * 3)
 	for range ticker.C {
-		log.JSONIndent(config)
+		log.Printf("%+v", config)
+
+		log.Println(config.Get("name"))
 	}
 }
 
 func TestRemoveDir(t *testing.T) {
 	key := removeDirPrefix("echo/klQn3lLIpjekYZI4/age", 1)
-	t.Log(key)
+	log.Println(key)
 }
