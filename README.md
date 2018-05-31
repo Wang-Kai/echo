@@ -11,7 +11,20 @@ Echo is a configuration manager based etcd .
 
 ### Getting started
 ```shell
+# run etcd on docker
+docker pull etcd
+docker run -d --name echo_etcd -p 2379:2379 etcd  
+
+# set some example k/v paramters
+docker exec -it echo_etcd /bin/sh
+
+ETCDCTL_API=3 etcdctl put "hi/echo/name" kim
+ETCDCTL_API=3 etcdctl put "hi/echo/age" 18
+
+# download echo lib
 $ go get -u github.com/Wang-Kai/echo
+
+go test -v -run=GetConf
 ```
 
  ```golang
@@ -44,5 +57,8 @@ func init() {
 	
 	// export global configuration
 	AppConf = config
+
+	// use your config any where
+	//  ...
 }
   ```
